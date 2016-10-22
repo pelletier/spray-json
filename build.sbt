@@ -7,7 +7,8 @@ lazy val root = project.in(file(".")).
     publishLocal := {}
   )
 
-lazy val sprayJson = crossProject.in(file(".")).
+lazy val sprayJson = crossProject.crossType(CrossType.Pure).in(file(".")).
+  enablePlugins(spray.boilerplate.BoilerplatePlugin).
   settings(
     name := "spray-json",
 
@@ -29,7 +30,9 @@ lazy val sprayJson = crossProject.in(file(".")).
 
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
 
-    resolvers += Opts.resolver.sonatypeReleases
+    resolvers += Opts.resolver.sonatypeReleases,
+
+    boilerplateSource in Compile := baseDirectory.value.getParentFile / "shared" / "src" / "main" / "boilerplate"
   ).
   jvmSettings(
     libraryDependencies ++= Seq(
@@ -47,9 +50,6 @@ lazy val sprayJson = crossProject.in(file(".")).
 lazy val sprayJsonJVM = sprayJson.jvm
 lazy val sprayJsonJS = sprayJson.js
 
-
-// generate boilerplate
-Boilerplate.settings
 
 // OSGi settings
 osgiSettings
