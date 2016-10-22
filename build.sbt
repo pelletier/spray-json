@@ -1,32 +1,52 @@
-name := "spray-json"
+import sbt.Keys._
 
-version := "1.3.2"
+lazy val root = project.in(file(".")).
+  aggregate(sprayJsonJS, sprayJsonJVM).
+  settings(
+    publish := {},
+    publishLocal := {}
+  )
 
-organization := "io.spray"
+lazy val sprayJson = crossProject.in(file(".")).
+  settings(
+    name := "spray-json",
 
-organizationHomepage := Some(new URL("http://spray.io"))
+    version := "1.3.2-SNAPSHOT",
 
-description := "A Scala library for easy and idiomatic JSON (de)serialization"
+    organization := "io.spray",
 
-homepage := Some(new URL("https://github.com/spray/spray-json"))
+    organizationHomepage := Some(new URL("http://spray.io")),
 
-startYear := Some(2011)
+    description := "A Scala library for easy and idiomatic JSON (de)serialization",
 
-licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+    homepage := Some(new URL("https://github.com/spray/spray-json")),
 
-scalaVersion := "2.11.8"
+    startYear := Some(2011),
 
-scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+    licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
 
-resolvers += Opts.resolver.sonatypeReleases
+    scalaVersion := "2.11.8",
 
-libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2-core" % "3.8.5.1" % "test",
-  "org.specs2" %% "specs2-scalacheck" % "3.8.5.1" % "test",
-  "org.scalacheck" %% "scalacheck" % "1.13.3" % "test"
-)
+    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
 
-(scalacOptions in doc) ++= Seq("-doc-title", name.value + " " + version.value)
+    resolvers += Opts.resolver.sonatypeReleases
+  ).
+  jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.8.5.1" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.8.5.1" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.13.3" % "test"
+    ),
+
+    (scalacOptions in doc) ++= Seq("-doc-title", name.value + " " + version.value)
+  ).
+  jsSettings(
+    // Add JS-specific settings here
+  )
+
+lazy val sprayJsonJVM = sprayJson.jvm
+lazy val sprayJsonJS = sprayJson.js
+
 
 // generate boilerplate
 Boilerplate.settings
@@ -57,7 +77,7 @@ useGpg := true
 publishTo <<= version { v: String =>
   val nexus = "https://oss.sonatype.org/"
   if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else                             Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
 pomIncludeRepository := { _ => false }
@@ -67,7 +87,11 @@ pomExtra :=
     <url>git://github.com/spray/spray.git</url>
     <connection>scm:git:git@github.com:spray/spray.git</connection>
   </scm>
-  <developers>
-    <developer><id>sirthias</id><name>Mathias Doenitz</name></developer>
-    <developer><id>jrudolph</id><name>Johannes Rudolph</name></developer>
-  </developers>
+    <developers>
+      <developer>
+        <id>sirthias</id> <name>Mathias Doenitz</name>
+      </developer>
+      <developer>
+        <id>jrudolph</id> <name>Johannes Rudolph</name>
+      </developer>
+    </developers>
